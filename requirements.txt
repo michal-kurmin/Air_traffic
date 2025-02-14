@@ -1,0 +1,7 @@
+streamlit
+matplotlib
+pandas
+azure.storage.blob
+io
+os
+numpy
