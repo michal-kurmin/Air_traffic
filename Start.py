@@ -12,7 +12,7 @@ def load_all_data_if_not_exists():
     file_path = "flights.csv"
         
     if os.path.exists(file_path):
-        st.write("")
+        st.write("Data already loaded")
     else:
         st.write("No data - importing from azure storage blob - please be patient")
         load_all_data()

@@ -1,6 +1,7 @@
 import pandas as pd
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
+from sklearn.preprocessing import LabelEncoder
 
 def load_data_from_blob():
     # Connection string to our blob
@@ -136,6 +137,7 @@ def load_all_data():
     #list_of_df=load_data_from_csv()
     clean_data(list_of_df)   
     busiest_load()
+    flights_delay_data()
         
    
 def busiest_load():
@@ -168,5 +170,42 @@ def busiest_load():
 
     # Save the result to a CSV file
     top_airports.to_csv('top_airports.csv', index=False)
+
+
+def flights_delay_data(file_path="flights.csv"):
+    try:
+        # Load the dataset
+        df = pd.read_csv(file_path)
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+        return
+
+    # Convert datetime columns
+    datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
+    for col in datetime_columns:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+
+    # Drop rows where essential datetime values are missing
+    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+
+    # Calculate delay-related features
+    df["Flight Duration (minutes)"] = (df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60
+    df["Departure Delay (minutes)"] = (df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60
+    df["Arrival Delay (minutes)"] = (df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60
+
+    # Define delay threshold
+    delay_threshold = 15
+    df["Delayed"] = (df["Departure Delay (minutes)"] >= delay_threshold).astype(int)
+
+    # Extract departure time features
+    df["Departure Hour"] = df["real_dep"].dt.hour
+    df["Departure Day"] = df["real_dep"].dt.day
+    df["Departure Weekday"] = df["real_dep"].dt.weekday
+
+    # Save the updated dataset
+
+    df.to_csv('flights_delay_data.csv', index=False)
+    print(f"Updated file saved as 'flights_delay_data.csv' with new columns added.")
+    return  df
 
 
