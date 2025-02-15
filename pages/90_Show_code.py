@@ -5,7 +5,7 @@ st.title("Show code")
 st.write("Please choose code you want to see")
 
 # List of options for the dropdown
-options = ['Choose page/modul to dispaly code','ETL', 'Start', 'Busiest Airports', 'Packages']
+options = ['Choose page/modul to dispaly code','ETL', 'Start', 'Busiest Airports', 'Average delay','Packages']
 
 # Create a dropdown list
 selected_option = st.selectbox("Select code to show:", options)
@@ -60,7 +60,11 @@ if selected_option=="main":
 if selected_option=="Busiest Airports":
     # Specify the file path
     display_code("pages/1_Busiest_airports.py")
-    
+
+if selected_option=="Average delay":
+    # Specify the file path
+    display_code("pages/3_Average_delay.py")
+
 if selected_option=="Packages":
     # Specify the file path
     display_code("requirements.txt")

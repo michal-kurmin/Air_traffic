@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from etl import load_all_data
+from etl import load_all_data,flights_delay_data,busiest_load
 
 st.set_page_config(
     page_title="Air Traffic Analytics",
@@ -13,6 +13,9 @@ def load_all_data_if_not_exists():
         
     if os.path.exists(file_path):
         st.write("Data already loaded")
+        busiest_load()
+        flights_delay_data()
+
     else:
         st.write("No data - importing from azure storage blob - please be patient")
         load_all_data()

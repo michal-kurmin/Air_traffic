@@ -5,6 +5,7 @@ from df_for_pages import average_delay_df
 # Load the processed dataset
 
 df = average_delay_df()
+
 # Average Delay by Departure Airport (Top 10 Airports)
 top_airports = df["dep_airport"].value_counts().head(10).index
 airport_delays = df[df["dep_airport"].isin(top_airports)].groupby("dep_airport")["Delayed"].mean()
@@ -21,3 +22,4 @@ ax.grid(True)
 
 st.pyplot(fig)
 
+st.dataframe(df, use_container_width=True)
