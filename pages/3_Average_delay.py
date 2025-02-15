@@ -1,7 +1,7 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 from df_for_pages import average_delay_df
-
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FixedLocator
 # Load the processed dataset
 
 df = average_delay_df()
@@ -17,6 +17,7 @@ ax.bar(airport_delays.index, airport_delays.values, color="red", alpha=0.7)
 ax.set_xlabel("Departure Airport")
 ax.set_ylabel("Proportion of Delayed Flights")
 ax.set_title("Proportion of Delayed Flights by Top 10 Departure Airports")
+ax.xaxis.set_major_locator(FixedLocator(range(len(airport_delays.index))))
 ax.set_xticklabels(airport_delays.index, rotation=45)
 ax.grid(True)
 
