@@ -189,9 +189,9 @@ def flights_delay_data(file_path="flights.csv"):
     df.dropna(subset=["real_dep", "real_arr"], inplace=True)
 
     # Calculate delay-related features
-    df["Flight Duration (minutes)"] = (df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60
-    df["Departure Delay (minutes)"] = (df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60
-    df["Arrival Delay (minutes)"] = (df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60
+    df["Flight Duration (minutes)"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
+    df["Departure Delay (minutes)"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
+    df["Arrival Delay (minutes)"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
 
     # Define delay threshold
     delay_threshold = 15
