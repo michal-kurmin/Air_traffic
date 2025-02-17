@@ -23,7 +23,21 @@ st.sidebar.title("Display Options")
 show_data = st.sidebar.checkbox("Show Data Table", value=True)
 show_horizontal = st.sidebar.checkbox("Horizontal chart", value=False)
 # Main title
-st.title("Airport Operations by Segment")
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+    h2 {
+        text-align: center;
+    }
+</style>
+""", unsafe_allow_html=True)
+st.write("")
+st.header("Busiest airports by number of monthly commercial operations")
 
 # Slider for number of airports
 num_airports = st.slider("Select the number of airports to display", 

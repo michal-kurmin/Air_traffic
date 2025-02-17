@@ -137,7 +137,7 @@ def load_all_data():
     #list_of_df=load_data_from_csv()
     clean_data(list_of_df)   
     busiest_load()
-        
+    covid_load()   
    
 def busiest_load():
     # Load data
@@ -153,11 +153,17 @@ def busiest_load():
     # Filter the original dataframe to include only the top airports
     top_airports_data = df[df['dep_airport'].isin(top_airports_ident)]
     
+    # Merge different groups of traditional airlnies in one group   
+    traditional_lines =['Traditional Scheduled',
+                        'Mainline',
+                        'Regional Aircraft']
+    top_airports_data['segment'] = top_airports_data['segment'].apply(lambda x: 'Traditional Airlines' if x in traditional_lines else x)  
+
     # Merge smaller categories in 'other'
     values_to_keep= ['All-Cargo',
                      'Not Classified', 
                      'Lowcost', 
-                     'Traditional Scheduled'
+                     'Traditional Airlines'
                       ]
     top_airports_data['segment'] = top_airports_data['segment'].apply(lambda x: x if x in values_to_keep else 'Other')    
     
@@ -170,4 +176,36 @@ def busiest_load():
     # Save the result to a CSV file
     top_airports.to_csv('top_airports.csv', index=False)
 
+def covid_load():
+    # Load data
+    df = pd.read_csv('C:/air/flights.csv', usecols=['plan_dep', 'segment'])
+    
+    # Convert 'plan_dep' to datetime format
+    df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S')
 
+    # Extract year and month into new columns
+    df['year'] = df['plan_dep'].dt.year
+    df['month'] = df['plan_dep'].dt.month
+
+    # Drop the original 'plan_dep' column
+    df = df.drop(columns=['plan_dep'])
+
+    # Merge different groups of traditional airlnies in one group   
+    traditional_lines =['Traditional Scheduled',
+                        'Mainline',
+                        'Regional Aircraft']
+    df['segment'] = df['segment'].apply(lambda x: 'Traditional Airlines' if x in traditional_lines else x)  
+
+    #Merge smaller categories in 'Other'
+    values_to_keep= ['Not Classified', 
+                     'Lowcost', 
+                     'Traditional Airlines'
+                     ]                      
+    df['segment'] = df['segment'].apply(lambda x: x if x in values_to_keep else 'Other') 
+    
+    # Process data to get total ops per year/month/segment
+    total_ops = df.groupby(['year','month','segment']).size().reset_index(name='total_ops')
+                  
+    # Save the result to a CSV file
+    total_ops.to_csv('covid.csv', index=False)
+    

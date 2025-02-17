@@ -5,3 +5,5 @@ azure.storage.blob
 io
 os
 numpy
+plotly.express
+plotly.subplots

@@ -1,106 +1,46 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.express as px
-
-def covid_load():
-    # Load data
-    df = pd.read_csv('C:/air/flights.csv', usecols=['plan_dep', 'segment'])
-    
-    print(df.head(3))
-    # Convert 'plan_dep' to datetime format
-    df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S')
-
-    # Extract year and month into new columns
-    df['year'] = df['plan_dep'].dt.year
-    df['month'] = df['plan_dep'].dt.month
-
-    # Drop the original 'plan_dep' column
-    df = df.drop(columns=['plan_dep'])
-# =============================================================================
-#     
-#     # Merge smaller categories in 'other'
-#     values_to_keep= ['All-Cargo',
-#                      'Not Classified', 
-#                      'Lowcost', 
-#                      'Traditional Scheduled',
-#                      'Charter'                      
-#                      ]
-# =============================================================================
-    
-    traditional_lines =['Traditional Scheduled',
-                        'Mainline',
-                        'Regional Aircraft']
+from plotly.subplots import make_subplots
+from df_for_pages import covid_df
+#import plotly.graph_objects as go
 
 
-    df['segment'] = df['segment'].apply(lambda x: 'Traditional Airlines' if x in traditional_lines else x)  
-    print(df.head(3))
-    #Merge smaller categories in 'other'
-    values_to_keep= ['Not Classified', 
-                     'Lowcost', 
-                     'Traditional Airlines'
-                     ]                      
-    df['segment'] = df['segment'].apply(lambda x: x if x in values_to_keep else 'Other') 
-    # Process data to get total ops per year/month/segment
-    total_ops = df.groupby(['year','month','segment']).size().reset_index(name='total_ops')
-    print(total_ops.head(20))                        
-    
-        # Save the result to a CSV file
-    #top_airports.to_csv('covid.csv', index=False)
-    return total_ops
+df=covid_df()
 
-
-def covid_df(): #df from csv
-    df=pd.read_csv('covid.csv')#
-    return df
-
-df=covid_load()
-
-# Create a line chart
-plt.plot(df['year'], df['total_ops'])
-
-# Adding titles and labels
-plt.title('Sample Line Chart')
-plt.xlabel('X-axis Label')
-plt.ylabel('Y-axis Label')
-
-# Display the chart
-plt.show()
-
-# Combine year and month into a single column for the x-axis
-df['year_month'] = df['year'].astype(str) + '-' + df['month'].astype(str)
-
-# Pivot the table to get 'year_month' as index and 'segment' as columns
-pivot_df = df.pivot(index='year_month', columns='segment', values='total_ops')
-
-# Plotting the line chart
-plt.figure(figsize=(10, 6))
-
-# Plot total operations for each segment
-for segment in pivot_df.columns:
-    plt.plot(pivot_df.index, pivot_df[segment], label=f'Segment {segment}')
-
-# Adding titles and labels
-plt.title('Total Operations by Year and Month')
-plt.xlabel('Year-Month')
-plt.ylabel('Total Operations')
-plt.legend()
-
-# Display the chart
-plt.show()
-
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+    h1 {
+        text-align: center;
+    }
+    h2 {
+        text-align: center;
+    }
+</style>
+""", unsafe_allow_html=True)
+st.write("")
+st.header("Impact of covid on number of montly commercial airtraffic operations")
+########################################################################
+#plot 2
 
 # First, let's create a line for total operations
-# Assuming your dataframe is called 'df'
 
 # Create datetime index for better x-axis display
 df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))
 df['sum'] = df.groupby('date')['total_ops'].transform('sum')
+
 # Create the total line chart
 fig = px.line(df, 
               x='date', 
               y='sum',
-              title='Operations by Segment Over Time')
+              title='Monthly total and segmented operations')
 
 # Add individual lines for each segment
 for segment in df['segment'].unique():
@@ -113,37 +53,50 @@ for segment in df['segment'].unique():
 # Customize the layout
 fig.update_layout(
     xaxis_title="Date",
-    yaxis_title="Total Operations",
+    yaxis_title="Operations",
     legend_title="Segments",
     hovermode='x unified'
 )
 
 # Display the chart in Streamlit
 st.plotly_chart(fig, use_container_width=True)
+#
+# Initializing DataFrames for each season
+mon_03 = df[df['month'] == 3]
+mon_06 = df[df['month'] == 6]
+mon_09 = df[df['month'] == 9]
+mon_12 = df[df['month'] == 12]
+          
+            # Create plots for each group
+fig_03 = px.line(mon_03, x='year', y='sum', title='March')
+fig_06 = px.line(mon_06, x='year', y='sum', title='June')
+fig_09 = px.line(mon_09, x='year', y='sum', title='September')
+fig_12 = px.line(mon_12, x='year', y='sum', title='December')
 
-# Create figure and axis
-plt.figure(figsize=(12, 6))
+# Create a 2x2 subplot
+fig = make_subplots(rows=2, cols=2, subplot_titles=('March', 'June', 'September', 'December'))
 
-# Create datetime index for better x-axis display
-df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))
+# Add the plots to the subplot
+fig.add_trace(fig_03['data'][0], row=1, col=1)
+fig.add_trace(fig_06['data'][0], row=1, col=2)
+fig.add_trace(fig_09['data'][0], row=2, col=1)
+fig.add_trace(fig_12['data'][0], row=2, col=2)
 
-# Plot each segment
-for segment in df['segment'].unique():
-    segment_data = df[df['segment'] == segment]
-    plt.plot(segment_data['date'], segment_data['total_ops'], label=segment)
+# Update layout
+fig.update_layout(height=600, width=800,
+                  title_text="")
+st.header("Sesonal flight impact of covid")
+# Display the chart in Streamlit
+import streamlit as st
+st.plotly_chart(fig, use_container_width=True)
 
-# Customize the plot
-plt.title('Operations by Segment Over Time')
-plt.xlabel('Date')
-plt.ylabel('Total Operations')
-plt.legend()
-plt.grid(True)
 
-# Rotate x-axis labels for better readability
-plt.xticks(rotation=45)
 
-# Adjust layout to prevent label cutoff
-plt.tight_layout()
 
-# Display in Streamlit
-st.pyplot(plt)
+
+
+
+
+
+
+
