@@ -41,6 +41,7 @@ def load_data_from_blob():
         blob_list = container_client.list_blobs()
         for blob in blob_list:
             # Download the blob content as a string
+            st.write('loading csv')
             blob_client = container_client.get_blob_client(blob)
             blob_data = blob_client.download_blob().content_as_text()
             
@@ -50,9 +51,9 @@ def load_data_from_blob():
             # Append the DataFrame to the list
             dataframes.append(df)
         
-        print("All CSV files have been loaded into a list of DataFrames.")
+        st.write("All CSV files have been loaded into a list of DataFrames.")
     except Exception as e:
-        print(f"Failed to load CSV files: {e}")
+        st.write(f"Failed to load CSV files: {e}")
     
     # Specify the file path to write number of csv files loaded
     file_path = "number.txt"
