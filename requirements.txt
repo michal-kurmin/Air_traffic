@@ -2,7 +2,6 @@ streamlit
 matplotlib
 pandas
 azure.storage.blob
-os
 numpy
 plotly.express
 plotly.subplots
