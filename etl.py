@@ -2,10 +2,11 @@ import pandas as pd
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import streamlit as st
+import os
 
 def load_data_from_blob():
     # Connection string to our blob
-    connection_string = blob_connection_string
+    connection_string = os.environ("BLOB_CONNECTION_STRING")
 
     # Create a BlobServiceClient object
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
@@ -63,7 +64,7 @@ def load_data_from_blob():
 
 def number_of_csv():
     # Check the number of csv files in our storage
-    connection_string = st.secrets.blob_connection_string
+    connection_string = os.environ("BLOB_CONNECTION_STRING")
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_name = "csv-data"
     container_client = blob_service_client.get_container_client(container_name)
