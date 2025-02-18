@@ -35,13 +35,14 @@ def load_data_from_blob():
                           'Actual Distance Flown (nm)']
     # Colums which we exclude: ['ECTRL ID','ADEP Latitude', 'ADEP Longitude',
     #'ADES Latitude', 'ADES Longitude','AC Registration','Requested FL']
-        
+    i=0
     try:
         # List blobs in the container
         blob_list = container_client.list_blobs()
         for blob in blob_list:
             # Download the blob content as a string
-            st.write('loading csv')
+            st.write('loading csv',i)
+            i+=1
             blob_client = container_client.get_blob_client(blob)
             blob_data = blob_client.download_blob().content_as_text()
             
@@ -61,6 +62,7 @@ def load_data_from_blob():
     # Open the file in write mode and write the integer as a string
     with open(file_path, 'w') as file:
         file.write(str(len(dataframes)))
+    st.write('file number written')
     return dataframes
 
 def number_of_csv():
@@ -79,6 +81,7 @@ def clean_data(list_of_DF):
     
     #One data frame
     flightsDF=pd.DataFrame()
+    st.write(flightsDF.head(3))
     for month in list_of_DF:
         flightsDF=pd.concat([flightsDF,month])
 
@@ -143,6 +146,7 @@ def load_all_data():
    
 def busiest_load():
     # Load data
+    st.write('busiesr')
     df = pd.read_csv('flights.csv', usecols=['dep_airport', 'segment'])
     airports = pd.read_csv('airport-codes.csv', usecols=['ident', 'name', 'municipality'])
 
@@ -180,6 +184,7 @@ def busiest_load():
 
 def covid_load():
     # Load data
+    st.write('covid')
     df = pd.read_csv('C:/air/flights.csv', usecols=['plan_dep', 'segment'])
     
     # Convert 'plan_dep' to datetime format
