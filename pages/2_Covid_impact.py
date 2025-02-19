@@ -37,12 +37,14 @@ fig = px.line(df,
               x='date',
               y='sum',
               title='Monthly total and segmented operations')
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Feb 12 14:58:43 2025
 
-@author: micha
-"""
+# Add individual lines for each segment
+for segment in df['segment'].unique():
+    segment_data = df[df['segment'] == segment]
+    fig.add_scatter(x=segment_data['date'],
+                   y=segment_data['total_ops'],
+                   name=segment,
+                   mode='lines')
 
 
 # Customize the layout
