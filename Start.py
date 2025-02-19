@@ -10,9 +10,14 @@ st.set_page_config(
 
 def load_all_data_if_not_exists():
     file_path = "flights.csv"
-        
+    file_path2 = "number.txt"
     if os.path.exists(file_path):
-        st.write("")
+        if os.path.exists(file_path2):
+            st.write("")
+        else:
+            st.write("Last import not finished - importing data from azure storage blob - please be patient")
+            load_all_data()
+            st.write("All data imported")
     else:
         st.write("No data - importing from azure storage blob - please be patient")
         load_all_data()
