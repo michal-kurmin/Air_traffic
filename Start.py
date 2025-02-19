@@ -8,21 +8,34 @@ st.set_page_config(
     layout="wide",  # Use wide layout
 )
 
+
 def load_all_data_if_not_exists():
     file_path = "flights.csv"
-    file_path2 = "number.txt"
-    if os.path.exists(file_path):
-        if os.path.exists(file_path2):
-            st.write("")
-        else:
+    if os.path.exists('status.txt'):
+        with open('status.txt', 'r') as file:
+            status = file.read().strip()
+        if status=='start':
             st.write("Last import not finished - importing data from azure storage blob - please be patient")
             load_all_data()
             st.write("All data imported")
+        if status=='finished':
+            if os.path.exists(file_path):
+                st.write("")
+            else:
+                st.write("No data - importing from azure storage blob - please be patient")
+                with open('status.txt', 'w') as file:
+                    file.write('start')
+                load_all_data()
+                st.write("All data imported")
+        if status not in ['start','finished']:
+            st.write('Error')
     else:
         st.write("No data - importing from azure storage blob - please be patient")
+        with open('status.txt', 'w') as file:
+            file.write('start')
         load_all_data()
         st.write("All data imported")
-
+    
 def load_page():
     st.markdown("""
     <style>

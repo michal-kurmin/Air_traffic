@@ -30,24 +30,13 @@ options = ['Choose page/modul to dispaly code',
            'Show code',
            'Packages']
 
-# Create a dropdown list
-st.markdown("""
-    <style>
-        div[data-baseweb="select"] > div {
-            max-height: 1000px !important;  # Adjust this value as needed
-            overflow-y: auto;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-# Your selectbox will now show more options
+# Create dropdown list
 selected_option = st.selectbox("Select code to show:", options)
 
+# Function to display the code of selected page
 def display_code(file_name):
     with open(file_name, 'r') as file:
-        # Read the entire file content
         content = file.read()
-    
     # Print the content
     st.header(f'File: {file_name}')
     st.code(content, language="python", line_numbers=True, wrap_lines=True)

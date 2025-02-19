@@ -27,12 +27,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.write("")
 st.header("Impact of covid on number of montly commercial airtraffic operations")
-########################################################################
-#plot 2
 
-# First, let's create a line for total operations
-
-# Create datetime index for better x-axis display
+# Create datetime index 
 df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))
 df['sum'] = df.groupby('date')['total_ops'].transform('sum')
 
@@ -60,14 +56,14 @@ fig.update_layout(
 
 # Display the chart in Streamlit
 st.plotly_chart(fig, use_container_width=True)
-#
-# Initializing DataFrames for each season
+
+# DataFrames for each season
 mon_03 = df[df['month'] == 3]
 mon_06 = df[df['month'] == 6]
 mon_09 = df[df['month'] == 9]
 mon_12 = df[df['month'] == 12]
           
-            # Create plots for each group
+# Create plots for each group
 fig_03 = px.line(mon_03, x='year', y='sum', title='March')
 fig_06 = px.line(mon_06, x='year', y='sum', title='June')
 fig_09 = px.line(mon_09, x='year', y='sum', title='September')
@@ -87,7 +83,7 @@ fig.update_layout(height=600, width=800,
                   title_text="")
 st.header("Sesonal flight impact of covid")
 # Display the chart in Streamlit
-import streamlit as st
+
 st.plotly_chart(fig, use_container_width=True)
 
 
