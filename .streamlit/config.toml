@@ -1,17 +1,20 @@
 [theme]
-# Primary accent color for interactive elements (light green)
-primaryColor = "#90EE90"
-
-# Background color for the main content area (very light blue)
-backgroundColor = "#CFFFFF"
-
-# Background color used for sidebar and most interactive widgets (light blue)
-secondaryBackgroundColor = "#ADD8E6"
-
-# Color used for almost all text (black)
-textColor = "#000000"
-
-# Font family for all text in the app
-font = "sans serif"
-
-#show_main_menu = True
+base = "dark"
+ #==============================================================================
+ # Primary accent color for interactive elements (light green)
+ #primaryColor = "#90EE90"
+ #
+ # Background color for the main content area (very light blue)
+ #backgroundColor = "#CFFFFF"
+ #
+ # Background color used for sidebar and most interactive widgets (light blue)
+ #secondaryBackgroundColor = "#ADD8E6"
+ #
+ # Color used for almost all text (black)
+ #textColor = "#000000"
+ #
+ # Font family for all text in the app
+ #font = "sans serif"
+ #
+ #==============================================================================
+#show_main_menu = false

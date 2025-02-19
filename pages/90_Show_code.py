@@ -1,9 +1,24 @@
 import streamlit as st
 
 # Streamlit app title
-st.title("Display code of modules and pages")
-#st.write("Please choose code you want to see")
-
+st.markdown("""
+<style>
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+    h1 {
+        text-align: center;
+    }
+    h2 {
+        text-align: center;
+    }
+</style>
+""", unsafe_allow_html=True)
+st.write("")
+st.header("Display code of modules and pages")
 # List of options for the dropdown
 options = ['Choose page/modul to dispaly code',
            'ETL',
@@ -16,14 +31,13 @@ options = ['Choose page/modul to dispaly code',
            'Show code',
            'Packages']
 
-# Create a dropdown list
+# Create dropdown list
 selected_option = st.selectbox("Select code to show:", options)
 
+# Function to display the code of selected page
 def display_code(file_name):
     with open(file_name, 'r') as file:
-        # Read the entire file content
         content = file.read()
-    
     # Print the content
     st.header(f'File: {file_name}')
     st.code(content, language="python", line_numbers=True, wrap_lines=True)

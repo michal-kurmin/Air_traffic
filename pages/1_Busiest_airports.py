@@ -75,7 +75,7 @@ else:
                     for airport in top_airports]
             
             # CHANGE: Use barh instead of bar and adjust positions
-            bars = ax.barh(y + i * bar_height, data, bar_height, 
+            bars = ax.barh(y + i * bar_height, data, bar_height,
                           label=segment_name, color=colors[i])
             
             # CHANGE: Adjust value labels for horizontal bars
