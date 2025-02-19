@@ -241,7 +241,7 @@ def busiest_load():
 def covid_load():
     # Load data
     st.write('covid')
-    df = pd.read_csv('C:/air/flights.csv', usecols=['plan_dep', 'segment'])
+    df = pd.read_csv('flights.csv', usecols=['plan_dep', 'segment'])
     
     # Convert 'plan_dep' to datetime format
     df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S')
