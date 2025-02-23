@@ -25,7 +25,8 @@ options = ['Choose page/modul to dispaly code',
            'Start',
            'Busiest Airports',
            'Covid impact',
-           'Average delay',
+           'Delayed flights',
+           'Planes and distances',
            'DataFrames for analytics',
            'Update data',
            'Show code',
@@ -47,24 +48,25 @@ if selected_option=="Choose page/modul to dispaly code":
     st.write("No page selected") 
     st.code("""
     streamlit_app/
-    ├── README.md                    # Project documentation
-    ├── requirements.txt             # Project dependencies
-    ├── .gitignore                   # Git ignore file
-    ├── Start.py                     # Main Streamlit application
-    ├── etl.py                       # Load data from azure, clean, and prepare data for pages
-    ├── df_for_pages                 # Read prepared csv and return df
-    ├── chartplane.jpg               # Image for Start,py
+    ├── README.md                       # Project documentation
+    ├── requirements.txt                # Project dependencies
+    ├── .gitignore                      # Git ignore file
+    ├── Start.py                        # Main Streamlit application
+    ├── etl.py                          # Load data from azure, clean, and prepare data for pages
+    ├── df_for_pages                    # Read prepared csv and return df
+    ├── chartplane.jpg                  # Image for Start,py
     │
-    ├── pages/                       # Additional pages for multi-page apps
-    │   ├── 1_Busiest_airports.py    # Airports traffic analytics
-    │   ├── 2_Covid_impact.py        # Traffic time analytics
-    │   ├──                          # Another
-    │   ├── 80_Update_data.py        # Checking for data updates/updating data
-    │   └── 90_Show_code.py          # Dispaying python code (current page)
+    ├── pages/                          # Additional pages for multi-page apps
+    │   ├── 1_Busiest_airports.py       # Airports traffic analytics
+    │   ├── 2_Covid_impact.py           # Traffic time analytics
+    │   ├── 3_Delayed_flights.py        # Delayed flights analysis
+    │   ├── 4_Planes_and_distances.py   # Planes and distances analysis
+    │   ├── 80_Update_data.py           # Checking for data updates/updating data
+    │   └── 90_Show_code.py             # Dispaying python code (current page)
     │
-    ├── data/                        # Data files
+    ├── data/                           # Data files
     │
-    └── .streamlit/config.toml       #stremlit config
+    └── .streamlit/config.toml          #stremlit config
 
     """, )
     
@@ -80,9 +82,13 @@ if selected_option=="Busiest Airports":
     # Specify the file path
     display_code("pages/1_Busiest_airports.py")
 
-if selected_option=="Average delay":
+if selected_option=="Delayed flights":
     # Specify the file path
-    display_code("pages/3_Average_delay.py")
+    display_code("pages/3_Delayed_flights.py")
+
+if selected_option=="Planes and distances":
+    # Specify the file path
+    display_code("pages/4_Planes_and_distances.py")
 
 if selected_option=="Packages":
     # Specify the file path

@@ -1,9 +1,12 @@
+from typing import Any
+
 import pandas as pd
+import tabula
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import streamlit as st
 import os
-from sklearn.preprocessing import LabelEncoder
+
 
 def load_data_from_blob():
     # If exists deleting flights.csv
@@ -20,7 +23,7 @@ def load_data_from_blob():
             print(f"Error occurred while deleting file {file_path}: {e}")
 
     # Connection string to our blob
-    connection_string = os.environ["BLOB_CONNECTION_STRING"]
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=sandejstorage;AccountKey=tLPltI8Pd2y6PX7TjLbjdlcYCaNTeJq94dILD3sCbXPtqTHyb1hiSMATJZXMIvOCl8qbjsXYepKv+ASt7DhKog==;EndpointSuffix=core.windows.net"
 
     # Create a BlobServiceClient object
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
@@ -78,7 +81,7 @@ def clean_chunk(df):
     df = df[~(df == '').any(axis=1)]
     
     #filter for regular planes (no helicopters etc)
-    #read data about aircrafts
+    #read data about aircraft
     aircraftDB = pd.read_csv('aircraft_types.csv') 
     conventional_airplanes = aircraftDB[aircraftDB['AircraftDescription'] == 'LandPlane']
     # Get unique values from the 'Description' column and convert to a list
@@ -113,7 +116,7 @@ def clean_chunk(df):
     
 def number_of_csv():
     # Check the number of csv files in our storage
-    connection_string = os.environ["BLOB_CONNECTION_STRING"]
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=sandejstorage;AccountKey=tLPltI8Pd2y6PX7TjLbjdlcYCaNTeJq94dILD3sCbXPtqTHyb1hiSMATJZXMIvOCl8qbjsXYepKv+ASt7DhKog==;EndpointSuffix=core.windows.net"
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_name = "csv-data"
     container_client = blob_service_client.get_container_client(container_name)
@@ -144,10 +147,18 @@ def load_all_data():
     st.write('Preparing data for analytics')
     busiest_load()
     covid_load()
+    flights_delay_data()
+    overall_delay_load()
+    hourly_delays_load()
+    flight_duration_load()
+    airports_delays_load()
+    # airline_operator_codes_load()
+    operators_delays_load()
+    plane_dist_load()
     with open('status.txt', 'w') as file:
         file.write('finished')
 
-    flights_delay_data()
+
 
 
 def busiest_load():
@@ -222,39 +233,138 @@ def covid_load():
     total_ops.to_csv('covid.csv', index=False)
 
 def flights_delay_data(file_path="flights.csv"):
-    try:
-        # Load the dataset
-        df = pd.read_csv(file_path)
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        return
+    if not os.path.exists('delayed_flights_check.csv'):
+        try:
+            # Load the dataset
+            df = pd.read_csv(file_path)
+        except FileNotFoundError:
+            print(f"Error: File '{file_path}' not found.")
+            return
+        print(f"Starting file preparation")
+        # Convert datetime columns
+        datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
+        for col in datetime_columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    # Convert datetime columns
-    datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
-    for col in datetime_columns:
-        df[col] = pd.to_datetime(df[col], errors="coerce")
+        # Drop rows where essential datetime values are missing
+        df.dropna(subset=["real_dep", "real_arr"], inplace=True)
 
-    # Drop rows where essential datetime values are missing
-    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+        # Calculate delay-related features
+        df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
+        df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
+        df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
 
-    # Calculate delay-related features
-    df["Flight Duration (minutes)"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
-    df["Departure Delay (minutes)"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
-    df["Arrival Delay (minutes)"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
+        # Define delay threshold
+        delay_threshold = 15
+        df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
 
-    # Define delay threshold
-    delay_threshold = 15
-    df["Delayed"] = (df["Departure Delay (minutes)"] >= delay_threshold).astype(int)
+        # Save the updated dataset
+        df.to_csv('delayed_flights_check.csv', index=False)
+        print(f"Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+        return df
+    else:
+        print("File 'delayed_flights_check.csv' already exists.")
+    return pd.read_csv('delayed_flights_check.csv')
 
+def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
+    # Load the dataset
+    df = pd.read_csv(delayed_flights_check)
+
+    # Group delayed flights
+    overall_delay = df.groupby('Delayed').size().reset_index(name='Number of Flights')
+
+    # Save the result to a new CSV file
+    overall_delay.to_csv('overall_delay.csv', index=False)
+    print(f"Overall delay data saved as 'overall_delay.csv'")
+    return overall_delay
+
+def hourly_delays_load(delayed_flights_check="delayed_flights_check.csv"):
+    # Load the dataset
+    df = pd.read_csv(delayed_flights_check)
+
+    df["real_dep"] = pd.to_datetime(df["real_dep"], errors="coerce")
     # Extract departure time features
     df["Departure Hour"] = df["real_dep"].dt.hour
-    df["Departure Day"] = df["real_dep"].dt.day
-    df["Departure Weekday"] = df["real_dep"].dt.weekday
+    bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+    labels = ['0-2', '2-4', '4-6', '6-8', '8-10', '10-12', '12-14', '14-16', '16-18', '18-20', '20-22', '22-24']
+    # Create a new column for the grouped departure hours
+    df['Departure Hour Group'] = pd.cut(df['Departure Hour'], bins=bins, labels=labels, right=False)
+    df["Departure Hour Group"] = pd.Categorical(df["Departure Hour Group"], ordered=True)
+    # Group delayed flights by the new 'Departure Hour Group' column
+    hourly_delays = df[df['Delayed'] == 1].groupby('Departure Hour Group').size().reset_index(name='Delayed flights')
 
-    # Save the updated dataset
+    # Save the result to a new CSV file
+    hourly_delays.to_csv('hourly_delays.csv', index=False)
+    print(f"Hourly delay data saved as 'hourly_delays.csv'")
+    return hourly_delays
 
-    df.to_csv('flights_delay_data.csv', index=False)
-    print(f"Updated file saved as 'flights_delay_data.csv' with new columns added.")
-    return  df
+def flight_duration_load(file_path="delayed_flights_check.csv"):
 
+    df = pd.read_csv(file_path)
+    df["Flight Duration Hours"] = df["Flight Duration"] / 60
+
+    bins = [0, 1, 3, 6, 9, 12, float("inf")]
+    labels = ["< 1 hour", "1-3 hours", "3-6 hours", "6-9 hours", "9-12 hours", "> 12 hours"]
+    #New column for the grouped flight duration
+    df["Flight Duration Range"] = pd.cut(df["Flight Duration Hours"], bins=bins, labels=labels, right=False)
+    # Filter delayed flights and save the updated dataset
+    df_FD = df[df['Delayed'] == 1].groupby('Flight Duration Range').size().reset_index(name='Delayed flights')
+    df_FD.to_csv("flight_duration_delay.csv", index=False)
+    print(f"Flight duration delays saved as 'flight_duration_delay.csv'")
+    return df_FD
+
+def airports_delays_load(file_path="delayed_flights_check.csv"):
+    df = pd.read_csv(file_path)
+    # Group by departure airport and calculate the proportion of delayed flights
+    airport_delays = df.groupby("dep_airport")["Delayed"].mean().reset_index()
+
+    # Load airport codes to get airport names
+    airports = pd.read_csv('airport-codes.csv', usecols=['ident', 'name'])
+    # Merge airport names into airport_delays dataframe
+    airport_delays = airport_delays.merge(airports, left_on='dep_airport', right_on='ident', how='left')
+    airport_delays.to_csv("airport_delays.csv", index=False)
+    print(f"Airport delays saved as 'airport_delays.csv'")
+    return airport_delays
+
+def operators_delays_load(file_path="delayed_flights_check.csv"):
+    df = pd.read_csv(file_path)
+    # Group by operator and calculate the proportion of delayed flights
+    operators_delays = df.groupby("operator")["Delayed"].mean().reset_index()
+
+    operators_delays.to_csv("operators_delays.csv", index=False)
+    print(f"Operator delays saved as 'operators_delays.csv'")
+    return operators_delays
+
+
+
+# def airline_operator_codes_load(file_path="List_of_airline_codes.pdf"):
+#
+#     # Extract all tables from the PDF
+#     tables = tabula.read_pdf("List_of_airline_codes.pdf", pages="all", multiple_tables=True)
+#     df = pd.concat(tables)
+#     print(df.head())
+#     df_filtered = df[["ICAO", "Airline"]]
+#
+#     # Export to CSV
+#     df_filtered.to_csv("airline_codes.csv", index=False)
+
+def plane_dist_load(file_path="flights.csv"):
+    #Corelation between aircraft type and distance flown
+    # Load the dataset
+    df = pd.read_csv(file_path)
+
+    # Filter out rows with missing values in the 'real_distance' column
+    df = df.dropna(subset=['real_distance'])
+
+    # Convert the 'real_distance' column to numeric
+    df['real_distance'] = pd.to_numeric(df['real_distance'], errors='coerce')
+
+    # Group by aircraft type and calculate the average distance flown
+    plane_dist = df.groupby('plane_type')['real_distance'].mean().round().reset_index(name='average_distance')
+
+
+    # Save the result to a new CSV file
+    plane_dist.to_csv('plane_distance.csv', index=False)
+    print(f"Average distance flown by aircraft type saved as 'plane_distance.csv'")
+    return plane_dist
 

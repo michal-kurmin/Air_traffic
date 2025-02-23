@@ -11,6 +11,11 @@ st.set_page_config(
 
 def load_all_data_if_not_exists():
     file_path = "flights.csv"
+    # if os.path.exists(file_path):
+    #     load_all_data()
+    #     st.write("Data loaded successfully")
+    # else:
+    #     st.write("No data file found, please ensure 'flights.csv' is available")
     if os.path.exists('status.txt'):
         with open('status.txt', 'r') as file:
             status = file.read().strip()
