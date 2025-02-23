@@ -28,13 +28,13 @@ st.markdown("""
 st.write("")
 st.header("Impact of covid on number of montly commercial airtraffic operations")
 
-# Create datetime index 
+# Create datetime index
 df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))
 df['sum'] = df.groupby('date')['total_ops'].transform('sum')
 
 # Create the total line chart
-fig = px.line(df, 
-              x='date', 
+fig = px.line(df,
+              x='date',
               y='sum',
               title='Monthly total and segmented operations')
 
@@ -45,6 +45,7 @@ for segment in df['segment'].unique():
                    y=segment_data['total_ops'],
                    name=segment,
                    mode='lines')
+
 
 # Customize the layout
 fig.update_layout(
@@ -62,7 +63,7 @@ mon_03 = df[df['month'] == 3]
 mon_06 = df[df['month'] == 6]
 mon_09 = df[df['month'] == 9]
 mon_12 = df[df['month'] == 12]
-          
+
 # Create plots for each group
 fig_03 = px.line(mon_03, x='year', y='sum', title='March')
 fig_06 = px.line(mon_06, x='year', y='sum', title='June')

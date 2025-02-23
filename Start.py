@@ -11,6 +11,11 @@ st.set_page_config(
 
 def load_all_data_if_not_exists():
     file_path = "flights.csv"
+    # if os.path.exists(file_path):
+    #     load_all_data()
+    #     st.write("Data loaded successfully")
+    # else:
+    #     st.write("No data file found, please ensure 'flights.csv' is available")
     if os.path.exists('status.txt'):
         with open('status.txt', 'r') as file:
             status = file.read().strip()
@@ -35,7 +40,7 @@ def load_all_data_if_not_exists():
             file.write('start')
         load_all_data()
         st.write("All data imported")
-    
+
 def load_page():
     st.markdown("""
     <style>
@@ -53,14 +58,14 @@ def load_page():
         }
     </style>
     """, unsafe_allow_html=True)
-    
-    
+
+
     # Add the image
-    
+
     st.title("Analysis of commercial flights based on data from Eurocontrol")
-    
-    
-    
+
+
+
     st.image("chartplane.jpg",use_container_width=True)
     st.header("Diploma project by Michal Kurmin and Kasia Sandej under the supervision of Dr. Krzysztof Ziolkowski")
     # Add text over the image
@@ -88,7 +93,7 @@ def load_page():
     #     """,
     #     unsafe_allow_html=True
     # )
-    
+
     # # Add text at the bottom
     # st.markdown(
     #     """
@@ -96,23 +101,23 @@ def load_page():
     #     """,
     #     unsafe_allow_html=True
     # )
-    
+
        
     st.markdown(
         """
         Data sources:
         
-        - **Air Traffic Data**: [EUROCONTROL](https://www.eurocontrol.int/) 
+        - **Air Traffic Data**: [EUROCONTROL](https://www.eurocontrol.int/)
         - **Airport Codes**: [DataHub](https://datahub.io/)
         - **Aircraft Database**: [Gigasheet](https://www.gigasheet.com)
         """
     )
-        
+
     st.markdown("""
-The ATM Dataset should only be used for research and development.  
-The ATM Dataset should not be shared or distributed.  
-EUROCONTROL should be duly acknowledged as the source of the ATM Dataset.  
-It is acknowledged and accepted that EUROCONTROL provides the ATM Dataset as-is, without warranties of any kind.  
+The ATM Dataset should only be used for research and development.
+The ATM Dataset should not be shared or distributed.
+EUROCONTROL should be duly acknowledged as the source of the ATM Dataset.
+It is acknowledged and accepted that EUROCONTROL provides the ATM Dataset as-is, without warranties of any kind.
 """)
 load_all_data_if_not_exists()
 load_page()
