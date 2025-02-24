@@ -27,7 +27,7 @@ st.write(new_data)
 
 def update():
     update_password = st.text_input("Please input password for data update", type="password")
-    env_pass = os.environ("UPDATE_PASS")
+    env_pass = os.environ["UPDATE_PASS"]
     
     if update_password == env_pass:
         try:
