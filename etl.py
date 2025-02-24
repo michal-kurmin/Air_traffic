@@ -1,7 +1,6 @@
-from typing import Any
-
+#from typing import Any
 import pandas as pd
-import tabula
+#import tabula
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import streamlit as st

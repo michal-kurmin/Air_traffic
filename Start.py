@@ -11,11 +11,6 @@ st.set_page_config(
 
 def load_all_data_if_not_exists():
     file_path = "flights.csv"
-    # if os.path.exists(file_path):
-    #     load_all_data()
-    #     st.write("Data loaded successfully")
-    # else:
-    #     st.write("No data file found, please ensure 'flights.csv' is available")
     if os.path.exists('status.txt'):
         with open('status.txt', 'r') as file:
             status = file.read().strip()
@@ -68,40 +63,7 @@ def load_page():
 
     st.image("chartplane.jpg",use_container_width=True)
     st.header("Diploma project by Michal Kurmin and Kasia Sandej under the supervision of Dr. Krzysztof Ziolkowski")
-    # Add text over the image
-    # st.markdown(
-    #     """
-    #     <style>
-    #     .title {
-    #         position: relative;
-    #         top: -800px; /* Adjust this value to move the text up or down */
-    #         text-align: center;
-    #         font-size: 52px;
-    #         color: black;
-    #         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    #     }
-    #     .footer {
-    #         position: relative;
-    #         top: -200px; /* Adjust this value to move the text up or down */
-    #         text-align: center;
-    #         font-size: 36px;
-    #         color: black;
-    #         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    #     }
-    #     </style>
-    #     <div class="title">Analysis of commercial flights based on data from EUROCONTROL</div>
-    #     """,
-    #     unsafe_allow_html=True
-    # )
-
-    # # Add text at the bottom
-    # st.markdown(
-    #     """
-    #     <div class="footer"> Diploma project by Michal and Kasia under the supervision of Dr. Krzysztof Ziolkowski</div>
-    #     """,
-    #     unsafe_allow_html=True
-    # )
-
+ 
        
     st.markdown(
         """

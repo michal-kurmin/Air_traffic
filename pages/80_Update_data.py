@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
 from etl import check_for_new_csv, load_all_data
 
 st.title("Update data")

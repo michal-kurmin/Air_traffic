@@ -1,11 +1,8 @@
 import pandas as pd
-#import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.express as px
 from plotly.subplots import make_subplots
 from df_for_pages import covid_df
-#import plotly.graph_objects as go
-
 
 df=covid_df()
 
