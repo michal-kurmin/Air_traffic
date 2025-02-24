@@ -1,6 +1,7 @@
 import streamlit as st
 from etl import check_for_new_csv, load_all_data
 import os
+
 st.markdown("""
 <style>
     .block-container {
@@ -17,17 +18,23 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 st.write("")
 st.header("Update data")
 st.write("")
 st.write("Checking if there is new data on azure storage blob")
-new_data=check_for_new_csv()
+new_data = check_for_new_csv()
 
 st.write(new_data)
 
-def update():
-    update_password = st.text_input("Please input password for data update", type="password")
-    env_pass = os.environ["UPDATE_PASS"]
+update_password = st.text_input("Please input password for data update", type="password")
+
+def perform_update():
+    env_pass = os.environ.get("UPDATE_PASS")
+    
+    if env_pass is None:
+        st.error("Environment variable 'UPDATE_PASS' is not set. Please configure it in your Azure app settings.")
+        return
     
     if update_password == env_pass:
         try:
@@ -39,11 +46,11 @@ def update():
     elif update_password:  # Only show error if password was actually entered
         st.error("Wrong password")
 
-if new_data=="New data available":
+if new_data == "New data available":
     st.write("Do you want to download new data?")
     if st.button("Update data"):
-        update()
-elif new_data=="No new data":
-    st.write("Do you want to udownload the same data again?")
+        perform_update()
+elif new_data == "No new data":
+    st.write("Do you want to download the same data again?")
     if st.button("Download data again"):
-        update()
+        perform_update()
