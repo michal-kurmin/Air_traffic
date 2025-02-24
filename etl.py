@@ -202,8 +202,8 @@ def covid_load():
     df = pd.read_csv('flights.csv', usecols=['plan_dep', 'segment'])
 
     # Convert 'plan_dep' to datetime format
-    df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S')
-
+    df['plan_dep'] = pd.to_datetime(df['plan_dep'], errors="coerce")
+    
     # Extract year and month into new columns
     df['year'] = df['plan_dep'].dt.year
     df['month'] = df['plan_dep'].dt.month
