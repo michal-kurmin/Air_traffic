@@ -232,38 +232,31 @@ def covid_load():
     total_ops.to_csv('covid.csv', index=False)
 
 def flights_delay_data(file_path="flights.csv"):
-    if not os.path.exists('delayed_flights_check.csv'):
-        try:
-            # Load the dataset
-            df = pd.read_csv(file_path)
-        except FileNotFoundError:
-            print(f"Error: File '{file_path}' not found.")
-            return
-        print(f"Starting file preparation")
-        # Convert datetime columns
-        datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
-        for col in datetime_columns:
-            df[col] = pd.to_datetime(df[col], errors="coerce")
+    # Load the dataset
+    df = pd.read_csv(file_path)
 
-        # Drop rows where essential datetime values are missing
-        df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+    print(f"Starting file preparation")
+    # Convert datetime columns
+    datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
+    for col in datetime_columns:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
 
-        # Calculate delay-related features
-        df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
-        df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
-        df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
+    # Drop rows where essential datetime values are missing
+    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
 
-        # Define delay threshold
-        delay_threshold = 15
-        df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
+    # Calculate delay-related features
+    df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
+    df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
+    df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
 
-        # Save the updated dataset
-        df.to_csv('delayed_flights_check.csv', index=False)
-        print(f"Updated file saved as 'delayed_flights_check.csv' with new columns added.")
-        return df
-    else:
-        print("File 'delayed_flights_check.csv' already exists.")
-    return pd.read_csv('delayed_flights_check.csv')
+    # Define delay threshold
+    delay_threshold = 15
+    df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
+
+    # Save the updated dataset
+    df.to_csv('delayed_flights_check.csv', index=False)
+    print(f"Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+    return df
 
 def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
