@@ -51,7 +51,7 @@ if show_chart_byOD:
 
 if show_chart_byDA:
     df = airports_delays_df()
-    # Average Delay by Departure Airport (Top 100 Airports)
+    # Average Delay by Departure Airport
     top_airports = df["name"].value_counts().head(100).index
     airport_delays = df[df["name"].isin(top_airports)].groupby("name")["Delayed"].mean().reset_index()
 
