@@ -234,7 +234,7 @@ def flights_delay_data(file_path="flights.csv"):
 
     # Load the dataset
     df = pd.read_csv(file_path)
-    print(f"Starting file preparation")
+    print("Starting file preparation")
     # Convert datetime columns
     datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
     for col in datetime_columns:
@@ -254,7 +254,7 @@ def flights_delay_data(file_path="flights.csv"):
 
     # Save the updated dataset
     df.to_csv('delayed_flights_check.csv', index=False)
-    print(f"Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+    print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
 
 def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
@@ -265,7 +265,7 @@ def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
 
     # Save the result to a new CSV file
     df.to_csv('overall_delay.csv', index=False)
-    print(f"Overall delay data saved as 'overall_delay.csv'")
+    print("Overall delay data saved as 'overall_delay.csv'")
 
 def hourly_delays_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
@@ -284,7 +284,7 @@ def hourly_delays_load(delayed_flights_check="delayed_flights_check.csv"):
 
     # Save the result to a new CSV file
     df.to_csv('hourly_delays.csv', index=False)
-    print(f"Hourly delay data saved as 'hourly_delays.csv'")
+    print("Hourly delay data saved as 'hourly_delays.csv'")
 
 def flight_duration_load(file_path="delayed_flights_check.csv"):
 
@@ -298,20 +298,19 @@ def flight_duration_load(file_path="delayed_flights_check.csv"):
     # Filter delayed flights and save the updated dataset
     df.df[df['Delayed'] == 1].groupby('Flight Duration Range').size().reset_index(name='Delayed flights')
     df.to_csv("flight_duration_delay.csv", index=False)
-    print(f"Flight duration delays saved as 'flight_duration_delay.csv'")
+    print("Flight duration delays saved as 'flight_duration_delay.csv'")
 
 
 def airports_delays_load(file_path="delayed_flights_check.csv"):
     df = pd.read_csv(file_path)
     # Group by departure airport and calculate the proportion of delayed flights
-    airport_delays = df.groupby("dep_airport")["Delayed"].mean().reset_index()
-
+    df.groupby("dep_airport")["Delayed"].mean().reset_index()
     # Load airport codes to get airport names
     airports = pd.read_csv('airport-codes.csv', usecols=['ident', 'name'])
     # Merge airport names into airport_delays dataframe
-    df.airport_delays.merge(airports, left_on='dep_airport', right_on='ident', how='left')
+    df.merge(airports, left_on='dep_airport', right_on='ident', how='left')
     df.to_csv("airport_delays.csv", index=False)
-    print(f"Airport delays saved as 'airport_delays.csv'")
+    print("Airport delays saved as 'airport_delays.csv'")
 
 def operators_delays_load(file_path="delayed_flights_check.csv"):
     df = pd.read_csv(file_path)
@@ -319,7 +318,7 @@ def operators_delays_load(file_path="delayed_flights_check.csv"):
     df.groupby("operator")["Delayed"].mean().reset_index()
 
     df.to_csv("operators_delays.csv", index=False)
-    print(f"Operator delays saved as 'operators_delays.csv'")
+    print("Operator delays saved as 'operators_delays.csv'")
 
 
 # def airline_operator_codes_load(file_path="List_of_airline_codes.pdf"):
@@ -349,5 +348,5 @@ def plane_dist_load(file_path="flights.csv"):
 
     # Save the result to a new CSV file
     df.to_csv('plane_distance.csv', index=False)
-    print(f"Average distance flown by aircraft type saved as 'plane_distance.csv'")
+    print("Average distance flown by aircraft type saved as 'plane_distance.csv'")
 
