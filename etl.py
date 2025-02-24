@@ -20,7 +20,18 @@ def load_data_from_blob():
             print(f"Permission denied: Unable to delete {file_path}.")
         except Exception as e:
             print(f"Error occurred while deleting file {file_path}: {e}")
-
+     
+    file_path = 'delayed_flights_check.csv'
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            print(f"File {file_path} deleted successfully.")
+        except FileNotFoundError:
+            print(f"File {file_path} does not exist.")
+        except PermissionError:
+            print(f"Permission denied: Unable to delete {file_path}.")
+        except Exception as e:
+            print(f"Error occurred while deleting file {file_path}: {e}")
     # Connection string to our blob
     connection_string = os.environ["BLOB_CONNECTION_STRING"]
     # Create a BlobServiceClient object
@@ -60,6 +71,7 @@ def load_data_from_blob():
             # Convert the string data to a DataFrame
             df = pd.read_csv(StringIO(blob_data),usecols=columns_to_include)
             clean_chunk(df)
+            flights_delay_data_chunk(df)
     except Exception as e:
         st.write(f"Failed to load CSV files: {e}")
     
@@ -147,7 +159,7 @@ def load_all_data():
     st.write('busiest done')
     covid_load()
     st.write('covid done')
-    flights_delay_data()
+    #flights_delay_data()
     st.write('flight_delay_data done')
     overall_delay_load()
     hourly_delays_load()
@@ -205,7 +217,7 @@ def covid_load():
     df = pd.read_csv('flights.csv', usecols=['plan_dep', 'segment'])
 
     # Convert 'plan_dep' to datetime format
-    df['plan_dep'] = pd.to_datetime(df['plan_dep'], errors="coerce")
+    df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S', errors="coerce")
     
     # Extract year and month into new columns
     df['year'] = df['plan_dep'].dt.year
@@ -233,11 +245,15 @@ def covid_load():
     # Save the result to a CSV file
     total_ops.to_csv('covid.csv', index=False)
 
-def flights_delay_data_chunk(file_path="flights.csv"):
+def flights_delay_data_chunk(df):
 
     # Load the dataset
-    df = pd.read_csv(file_path)
-    print("Starting file preparation")
+    #print("Starting file preparation")
+    new_column_names =['dep_airport', 'arr_airport', 'plan_dep', 'plan_arr',
+           'real_dep', 'real_arr', 'plane_type',
+           'operator', 'fligt_type', 'segment',
+           'real_distance']
+    df.columns=new_column_names
     # Convert datetime columns
     datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
     for col in datetime_columns:
@@ -256,38 +272,45 @@ def flights_delay_data_chunk(file_path="flights.csv"):
     df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
 
     # Save the updated dataset
-    df.to_csv('delayed_flights_check.csv', index=False)
-    st.write("flighgts_delay_data")
+    #st.write("flighgts_delay_data")
     print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+    if os.path.exists('delayed_flights_check.csv'):
+        df.to_csv('delayed_flights_check.csv', mode='a', header=False, index=False)
+    else:
+        #Changing columns names for more user friendly
+        df.to_csv('delayed_flights_check.csv', index=False)
 
-
-def flights_delay_data(file_path="flights.csv"):
-
+# =============================================================================
+# 
+# def flights_delay_data(file_path="flights.csv"):
+#
+#  
     # Load the dataset
-    df = pd.read_csv(file_path)
-    print("Starting file preparation")
+  #  df = pd.read_csv(file_path)
+ #   print("Starting file preparation")
     # Convert datetime columns
-    datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
-    for col in datetime_columns:
-        df[col] = pd.to_datetime(df[col], errors="coerce")
-
-    # Drop rows where essential datetime values are missing
-    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
-
-    # Calculate delay-related features
-    df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
-    df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
-    df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
-
-    # Define delay threshold
-    delay_threshold = 15
-    df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
-
-    # Save the updated dataset
-    df.to_csv('delayed_flights_check.csv', index=False)
-    st.write("flighgts_delay_data")
-    print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
-
+#   datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
+#     for col in datetime_columns:
+#         df[col] = pd.to_datetime(df[col], errors="coerce")
+# 
+#     # Drop rows where essential datetime values are missing
+#     df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+# 
+#     # Calculate delay-related features
+#     df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
+#     df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
+#     df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
+# 
+#     # Define delay threshold
+#     delay_threshold = 15
+#     df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
+# 
+#     # Save the updated dataset
+#     df.to_csv('delayed_flights_check.csv', index=False)
+#     st.write("flighgts_delay_data")
+#     print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+# 
+# =============================================================================
 def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
     df = pd.read_csv(delayed_flights_check)
