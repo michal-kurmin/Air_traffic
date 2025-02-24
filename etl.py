@@ -241,7 +241,7 @@ def flights_delay_data(file_path="flights.csv"):
         df[col] = pd.to_datetime(df[col], errors="coerce")
 
     # Drop rows where essential datetime values are missing
-    df= df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
 
     # Calculate delay-related features
     df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
