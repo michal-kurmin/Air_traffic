@@ -48,13 +48,14 @@ if selected_option=="Choose page/modul to dispaly code":
     st.write("No page selected") 
     st.code("""
     streamlit_app/
-    ├── README.md                       # Project documentation
     ├── requirements.txt                # Project dependencies
     ├── .gitignore                      # Git ignore file
     ├── Start.py                        # Main Streamlit application
     ├── etl.py                          # Load data from azure, clean, and prepare data for pages
     ├── df_for_pages                    # Read prepared csv and return df
     ├── chartplane.jpg                  # Image for Start,py
+    ├── number.txt                      # Number of raw data files downloaded
+    ├── status.txt                      # Status of completition of last data download   
     │
     ├── pages/                          # Additional pages for multi-page apps
     │   ├── 1_Busiest_airports.py       # Airports traffic analytics
@@ -64,7 +65,7 @@ if selected_option=="Choose page/modul to dispaly code":
     │   ├── 80_Update_data.py           # Checking for data updates/updating data
     │   └── 90_Show_code.py             # Dispaying python code (current page)
     │
-    ├── data/                           # Data files
+    ├── *.csv                           # Data files
     │
     └── .streamlit/config.toml          #stremlit config
 
@@ -82,6 +83,10 @@ if selected_option=="Busiest Airports":
     # Specify the file path
     display_code("pages/1_Busiest_airports.py")
 
+if selected_option=="Covid impact":
+    # Specify the file path
+    display_code("pages/2_Covid_impact.py")
+
 if selected_option=="Delayed flights":
     # Specify the file path
     display_code("pages/3_Delayed_flights.py")
@@ -93,10 +98,6 @@ if selected_option=="Planes and distances":
 if selected_option=="Packages":
     # Specify the file path
     display_code("requirements.txt")
-
-if selected_option=="Covid impact":
-    # Specify the file path
-    display_code("pages/2_Covid_impact.py")
 
 if selected_option=="DataFrames for analytics":
     # Specify the file path

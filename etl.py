@@ -1,6 +1,4 @@
-#from typing import Any
 import pandas as pd
-#import tabula
 from azure.storage.blob import BlobServiceClient
 from io import StringIO
 import streamlit as st
@@ -156,9 +154,9 @@ def load_all_data():
     load_data_from_blob()
     st.write('Preparing data for analytics')
     busiest_load()
-    st.write('busiest done')
+    st.write('busiest airports done')
     covid_load()
-    st.write('covid done')
+    st.write('covid impact done')
     #flights_delay_data()
     st.write('flight_delay_data done')
     overall_delay_load()
@@ -280,37 +278,6 @@ def flights_delay_data_chunk(df):
         #Changing columns names for more user friendly
         df.to_csv('delayed_flights_check.csv', index=False)
 
-# =============================================================================
-# 
-# def flights_delay_data(file_path="flights.csv"):
-#
-#  
-    # Load the dataset
-  #  df = pd.read_csv(file_path)
- #   print("Starting file preparation")
-    # Convert datetime columns
-#   datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
-#     for col in datetime_columns:
-#         df[col] = pd.to_datetime(df[col], errors="coerce")
-# 
-#     # Drop rows where essential datetime values are missing
-#     df.dropna(subset=["real_dep", "real_arr"], inplace=True)
-# 
-#     # Calculate delay-related features
-#     df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
-#     df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
-#     df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
-# 
-#     # Define delay threshold
-#     delay_threshold = 15
-#     df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
-# 
-#     # Save the updated dataset
-#     df.to_csv('delayed_flights_check.csv', index=False)
-#     st.write("flighgts_delay_data")
-#     print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
-# 
-# =============================================================================
 def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
     df = pd.read_csv(delayed_flights_check)
@@ -321,7 +288,7 @@ def overall_delay_load(delayed_flights_check="delayed_flights_check.csv"):
     # Save the result to a new CSV file
     df.to_csv('overall_delay.csv', index=False)
     print("Overall delay data saved as 'overall_delay.csv'")
-    st.write("overall_dealy")
+    st.write("overall delay done")
 def hourly_delays_load(delayed_flights_check="delayed_flights_check.csv"):
     # Load the dataset
     df = pd.read_csv(delayed_flights_check)
@@ -340,7 +307,7 @@ def hourly_delays_load(delayed_flights_check="delayed_flights_check.csv"):
     # Save the result to a new CSV file
     df.to_csv('hourly_delays.csv', index=False)
     print("Hourly delay data saved as 'hourly_delays.csv'")
-    st.write("hourly_delays")
+    st.write("hourly_delays done")
 def flight_duration_load(file_path="delayed_flights_check.csv"):
 
     df = pd.read_csv(file_path)
@@ -354,7 +321,7 @@ def flight_duration_load(file_path="delayed_flights_check.csv"):
     df=df[df['Delayed'] == 1].groupby('Flight Duration Range').size().reset_index(name='Delayed flights')
     df.to_csv("flight_duration_delay.csv", index=False)
     print("Flight duration delays saved as 'flight_duration_delay.csv'")
-    st.write("fly duration d=elay")
+    st.write("fly duration delay done")
 
 def airports_delays_load(file_path="delayed_flights_check.csv"):
     df = pd.read_csv(file_path)
@@ -374,7 +341,7 @@ def operators_delays_load(file_path="delayed_flights_check.csv"):
 
     df.to_csv("operators_delays.csv", index=False)
     print("Operator delays saved as 'operators_delays.csv'")
-    st.write("operators delays")
+    st.write("Operators delays done")
 
 # def airline_operator_codes_load(file_path="List_of_airline_codes.pdf"):
 #
@@ -405,4 +372,4 @@ def plane_dist_load(file_path="flights.csv"):
     # Save the result to a new CSV file
     df.to_csv('plane_distance.csv', index=False)
     print("Average distance flown by aircraft type saved as 'plane_distance.csv'")
-    st.write("plane_distance")
+    st.write("plane_distance done")
