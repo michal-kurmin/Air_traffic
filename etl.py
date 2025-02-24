@@ -218,7 +218,7 @@ def covid_load():
 
     # Convert 'plan_dep' to datetime format
     df['plan_dep'] = pd.to_datetime(df['plan_dep'], format='%d-%m-%Y %H:%M:%S', errors="coerce")
-    
+    df.dropna(inplace=True)
     # Extract year and month into new columns
     df['year'] = df['plan_dep'].dt.year
     df['month'] = df['plan_dep'].dt.month
@@ -388,9 +388,10 @@ def operators_delays_load(file_path="delayed_flights_check.csv"):
 #     df_filtered.to_csv("airline_codes.csv", index=False)
 
 def plane_dist_load(file_path="flights.csv"):
+   
     #Corelation between aircraft type and distance flown
     # Load the dataset
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, usecols=['plane_type', 'real_distance'])
 
     # Filter out rows with missing values in the 'real_distance' column
     df = df.dropna(subset=['real_distance'])
