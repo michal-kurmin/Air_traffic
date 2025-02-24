@@ -144,8 +144,11 @@ def load_all_data():
     load_data_from_blob()
     st.write('Preparing data for analytics')
     busiest_load()
+    st.write('busiest done')
     covid_load()
+    st.write('covid done')
     flights_delay_data()
+    st.write('flight_delay_data done')
     overall_delay_load()
     hourly_delays_load()
     flight_duration_load()
@@ -229,6 +232,34 @@ def covid_load():
 
     # Save the result to a CSV file
     total_ops.to_csv('covid.csv', index=False)
+
+def flights_delay_data_chunk(file_path="flights.csv"):
+
+    # Load the dataset
+    df = pd.read_csv(file_path)
+    print("Starting file preparation")
+    # Convert datetime columns
+    datetime_columns = ["plan_dep", "plan_arr", "real_dep", "real_arr"]
+    for col in datetime_columns:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+
+    # Drop rows where essential datetime values are missing
+    df.dropna(subset=["real_dep", "real_arr"], inplace=True)
+
+    # Calculate delay-related features
+    df["Flight Duration"] = ((df["real_arr"] - df["real_dep"]).dt.total_seconds() / 60).round()
+    df["Departure Delay"] = ((df["real_dep"] - df["plan_dep"]).dt.total_seconds() / 60).round()
+    df["Arrival Delay"] = ((df["real_arr"] - df["plan_arr"]).dt.total_seconds() / 60).round()
+
+    # Define delay threshold
+    delay_threshold = 15
+    df["Delayed"] = (df["Departure Delay"] >= delay_threshold).astype(int)
+
+    # Save the updated dataset
+    df.to_csv('delayed_flights_check.csv', index=False)
+    st.write("flighgts_delay_data")
+    print("Updated file saved as 'delayed_flights_check.csv' with new columns added.")
+
 
 def flights_delay_data(file_path="flights.csv"):
 
